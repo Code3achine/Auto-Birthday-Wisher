@@ -1,4 +1,2 @@
-selenium
-pandas
-webdriver-manager
-pyperclip
+supabase
+requests
