@@ -1,26 +1,31 @@
 name: Daily Birthday Wisher
+
 on:
   schedule:
-    - cron: '50 12 * * *'
+    - cron: '0 3 * * *'
   workflow_dispatch:
+
 jobs:
   run-script:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - run: python birthday_checker.py
+
+      - name: Run birthday checker
+        run: python birthday_checker.py
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           GREEN_INSTANCE_ID: ${{ secrets.GREEN_INSTANCE_ID }}
           GREEN_API_TOKEN: ${{ secrets.GREEN_API_TOKEN }}
-        run: python main.py
