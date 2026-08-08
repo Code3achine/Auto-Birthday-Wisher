@@ -57,6 +57,25 @@ def send_whatsapp(phone_number: str, message_text: str) -> dict:
         return {"error": f"non_json_response: {response.text}"}
 
 
+def reset_stale_last_sent(row, now):
+    """
+    If last_sent is from a previous year, null it out in Supabase.
+    Not required for dup-prevention (full YYYY-MM-DD compare already
+    handles that), but keeps the LastSent column clean year over year.
+    Mutates row in place so the rest of check_birthdays sees fresh data.
+    """
+    last_sent = row.get("last_sent")
+    if not last_sent:
+        return
+    try:
+        last_sent_year = int(str(last_sent)[:4])
+    except (ValueError, TypeError):
+        return
+    if last_sent_year != now.year:
+        supabase.table("contacts").update({"last_sent": None}).eq("id", row["id"]).execute()
+        row["last_sent"] = None
+
+
 def check_birthdays():
     """
     Queries active database contacts, evaluates birthday matches for today,
@@ -70,6 +89,8 @@ def check_birthdays():
     today_ymd = now.strftime("%Y-%m-%d")
 
     for row in contacts:
+        reset_stale_last_sent(row, now)
+
         if not row.get("birthday") or not row.get("phone"):
             continue
 
