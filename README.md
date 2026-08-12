@@ -1,1 +1,0 @@
-System stores friends' birthday information in local database or CSV file. Every day, application checks current date. If birthday matches current date, system opens WhatsApp Web, searches contact, sends predefined birthday message automatically, then records successful delivery in log
